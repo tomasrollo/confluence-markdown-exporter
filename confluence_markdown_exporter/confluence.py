@@ -408,10 +408,13 @@ class Page(Document):
         logger.info(f"Exporting page '{self.title}' (ID: {self.id})")
         if DEBUG:
             self.export_body()
+        try:
         # Export attachments first so the files can be utilized during markdown conversion
-        self.export_attachments()
-        self.export_markdown()
-        logger.info(f"Successfully exported page '{self.title}' (ID: {self.id})")
+            self.export_attachments()
+            self.export_markdown()
+            logger.info(f"Successfully exported page '{self.title}' (ID: {self.id})")
+        except Exception as e:
+            logger.exception(f"Error exporting page '{self.title}' (ID: {self.id}): {e}")
 
     def export_with_descendants(self) -> None:
         export_pages([self.id, *self.descendants])
