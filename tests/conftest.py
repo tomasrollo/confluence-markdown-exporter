@@ -7,10 +7,14 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from pydantic import AnyHttpUrl, SecretStr
+from pydantic import AnyHttpUrl
+from pydantic import SecretStr
 
-from confluence_markdown_exporter.utils.app_data_store import (
-    ApiDetails, AuthConfig, ConfigModel, ConnectionConfig, ExportConfig)
+from confluence_markdown_exporter.utils.app_data_store import ApiDetails
+from confluence_markdown_exporter.utils.app_data_store import AuthConfig
+from confluence_markdown_exporter.utils.app_data_store import ConfigModel
+from confluence_markdown_exporter.utils.app_data_store import ConnectionConfig
+from confluence_markdown_exporter.utils.app_data_store import ExportConfig
 
 
 @pytest.fixture

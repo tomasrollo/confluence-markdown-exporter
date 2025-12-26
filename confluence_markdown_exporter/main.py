@@ -47,7 +47,7 @@ def pages(
 
     setup_logging(verbose)
     logger.info(f"Starting export for pages: {', '.join(pages)}")
-    
+
     with measure(f"Export pages {', '.join(pages)}"):
         for page in pages:
             override_output_path_config(output_path)
@@ -78,7 +78,7 @@ def pages_with_descendants(
 
     setup_logging(verbose)
     logger.info(f"Starting export for pages with descendants: {', '.join(pages)}")
-    
+
     with measure(f"Export pages {', '.join(pages)} with descendants"):
         for page in pages:
             override_output_path_config(output_path)
@@ -109,7 +109,7 @@ def spaces(
 
     setup_logging(verbose)
     logger.info(f"Starting export for spaces: {', '.join(space_keys)}")
-    
+
     with measure(f"Export spaces {', '.join(space_keys)}"):
         for space_key in space_keys:
             override_output_path_config(output_path)
@@ -139,7 +139,7 @@ def all_spaces(
 
     setup_logging(verbose)
     logger.info("Starting export for all spaces")
-    
+
     with measure("Export all spaces"):
         override_output_path_config(output_path)
         org = Organization.from_api()

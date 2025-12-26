@@ -13,25 +13,31 @@ from collections.abc import Set
 from os import PathLike
 from pathlib import Path
 from string import Template
-from typing import Literal, TypeAlias, cast
-from urllib.parse import unquote, urlparse
+from typing import Literal
+from typing import TypeAlias
+from typing import cast
+from urllib.parse import unquote
+from urllib.parse import urlparse
 
 import yaml
-from atlassian.errors import ApiError, ApiNotFoundError
-from bs4 import BeautifulSoup, Tag
-from markdownify import ATX, MarkdownConverter
+from atlassian.errors import ApiError
+from atlassian.errors import ApiNotFoundError
+from bs4 import BeautifulSoup
+from bs4 import Tag
+from markdownify import ATX
+from markdownify import MarkdownConverter
 from pydantic import BaseModel
 from requests import HTTPError
 from tqdm import tqdm
 
-from confluence_markdown_exporter.api_clients import (get_confluence_instance,
-                                                      get_jira_instance)
-from confluence_markdown_exporter.utils.app_data_store import (get_settings,
-                                                               set_setting)
-from confluence_markdown_exporter.utils.drawio_converter import \
-    load_and_parse_drawio
-from confluence_markdown_exporter.utils.export import (sanitize_filename,
-                                                       sanitize_key, save_file)
+from confluence_markdown_exporter.api_clients import get_confluence_instance
+from confluence_markdown_exporter.api_clients import get_jira_instance
+from confluence_markdown_exporter.utils.app_data_store import get_settings
+from confluence_markdown_exporter.utils.app_data_store import set_setting
+from confluence_markdown_exporter.utils.drawio_converter import load_and_parse_drawio
+from confluence_markdown_exporter.utils.export import sanitize_filename
+from confluence_markdown_exporter.utils.export import sanitize_key
+from confluence_markdown_exporter.utils.export import save_file
 from confluence_markdown_exporter.utils.table_converter import TableConverter
 from confluence_markdown_exporter.utils.type_converter import str_to_bool
 
@@ -489,7 +495,7 @@ class Page(Document):
         if "history" in data:
             history = data.get("history", {})
             created = history.get("createdDate")
-        
+
         return cls(
             id=data.get("id", 0),
             title=data.get("title", ""),
@@ -595,19 +601,19 @@ class Page(Document):
             # Add created and last updated if available
             created = None
             last_updated = None
-            
+
             if self.page.created:
                 created = self.page.created
-            
+
             if self.page.version and self.page.version.when:
                 last_updated = self.page.version.when
-            
+
             props = {"tags": self.labels}
             if created:
                 props["created"] = created
             if last_updated:
                 props["last_updated"] = last_updated
-            
+
             self.set_page_properties(**props)
 
             if not self.page_properties:
