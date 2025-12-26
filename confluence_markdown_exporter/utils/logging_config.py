@@ -8,7 +8,7 @@ from pathlib import Path
 
 def setup_logging(verbose: bool = False) -> None:
     """Configure logging for the application.
-    
+
     Args:
         verbose: If True, outputs logs to console with INFO level.
                  If False, only WARNING and above are shown.
@@ -24,10 +24,7 @@ def setup_logging(verbose: bool = False) -> None:
 
     # Create console handler
     console_handler = logging.StreamHandler(sys.stdout)
-    if verbose:
-        console_level = logging.INFO
-    else:
-        console_level = logging.WARNING
+    console_level = logging.INFO if verbose else logging.WARNING
     console_handler.setLevel(console_level)
 
     # Create formatter for console
