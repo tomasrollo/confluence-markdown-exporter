@@ -7,14 +7,10 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from pydantic import AnyHttpUrl
-from pydantic import SecretStr
+from pydantic import AnyHttpUrl, SecretStr
 
-from confluence_markdown_exporter.utils.app_data_store import ApiDetails
-from confluence_markdown_exporter.utils.app_data_store import AuthConfig
-from confluence_markdown_exporter.utils.app_data_store import ConfigModel
-from confluence_markdown_exporter.utils.app_data_store import ConnectionConfig
-from confluence_markdown_exporter.utils.app_data_store import ExportConfig
+from confluence_markdown_exporter.utils.app_data_store import (
+    ApiDetails, AuthConfig, ConfigModel, ConnectionConfig, ExportConfig)
 
 
 @pytest.fixture
@@ -115,6 +111,7 @@ def confluence_page_response() -> dict[str, Any]:
         "status": "current",
         "title": "Test Page",
         "space": {"key": "TEST", "name": "Test Space", "id": "123"},
+        "created": "2023-01-01T00:00:00.000Z",
         "version": {
             "number": 1,
             "when": "2023-01-01T00:00:00.000Z",
