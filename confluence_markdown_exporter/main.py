@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from typing import Annotated
@@ -8,10 +9,13 @@ from confluence_markdown_exporter import __version__
 from confluence_markdown_exporter.utils.app_data_store import get_settings
 from confluence_markdown_exporter.utils.app_data_store import set_setting
 from confluence_markdown_exporter.utils.config_interactive import main_config_menu_loop
+from confluence_markdown_exporter.utils.logging_config import setup_logging
 from confluence_markdown_exporter.utils.measure_time import measure
 from confluence_markdown_exporter.utils.type_converter import str_to_bool
 
 DEBUG: bool = str_to_bool(os.getenv("DEBUG", "False"))
+
+logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 
@@ -31,14 +35,26 @@ def pages(
             help="Directory to write exported Markdown files to. Overrides config if set."
         ),
     ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v",
+            help="Enable verbose logging output to console"
+        ),
+    ] = False,
 ) -> None:
     from confluence_markdown_exporter.confluence import Page
 
+    setup_logging(verbose)
+    logger.info(f"Starting export for pages: {', '.join(pages)}")
+    
     with measure(f"Export pages {', '.join(pages)}"):
         for page in pages:
             override_output_path_config(output_path)
+            logger.info(f"Processing page: {page}")
             _page = Page.from_id(int(page)) if page.isdigit() else Page.from_url(page)
             _page.export()
+            logger.info(f"Completed export for page: {page}")
 
 
 @app.command(help="Export Confluence pages and their descendant pages by ID or URL to Markdown.")
@@ -50,14 +66,26 @@ def pages_with_descendants(
             help="Directory to write exported Markdown files to. Overrides config if set."
         ),
     ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v",
+            help="Enable verbose logging output to console"
+        ),
+    ] = False,
 ) -> None:
     from confluence_markdown_exporter.confluence import Page
 
+    setup_logging(verbose)
+    logger.info(f"Starting export for pages with descendants: {', '.join(pages)}")
+    
     with measure(f"Export pages {', '.join(pages)} with descendants"):
         for page in pages:
             override_output_path_config(output_path)
+            logger.info(f"Processing page with descendants: {page}")
             _page = Page.from_id(int(page)) if page.isdigit() else Page.from_url(page)
             _page.export_with_descendants()
+            logger.info(f"Completed export for page with descendants: {page}")
 
 
 @app.command(help="Export all Confluence pages of one or more spaces to Markdown.")
@@ -69,14 +97,26 @@ def spaces(
             help="Directory to write exported Markdown files to. Overrides config if set."
         ),
     ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v",
+            help="Enable verbose logging output to console"
+        ),
+    ] = False,
 ) -> None:
     from confluence_markdown_exporter.confluence import Space
 
+    setup_logging(verbose)
+    logger.info(f"Starting export for spaces: {', '.join(space_keys)}")
+    
     with measure(f"Export spaces {', '.join(space_keys)}"):
         for space_key in space_keys:
             override_output_path_config(output_path)
+            logger.info(f"Processing space: {space_key}")
             space = Space.from_key(space_key)
             space.export()
+            logger.info(f"Completed export for space: {space_key}")
 
 
 @app.command(help="Export all Confluence pages across all spaces to Markdown.")
@@ -87,13 +127,24 @@ def all_spaces(
             help="Directory to write exported Markdown files to. Overrides config if set."
         ),
     ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v",
+            help="Enable verbose logging output to console"
+        ),
+    ] = False,
 ) -> None:
     from confluence_markdown_exporter.confluence import Organization
 
+    setup_logging(verbose)
+    logger.info("Starting export for all spaces")
+    
     with measure("Export all spaces"):
         override_output_path_config(output_path)
         org = Organization.from_api()
         org.export()
+        logger.info("Completed export for all spaces")
 
 
 @app.command(help="Open the interactive configuration menu or display current configuration.")

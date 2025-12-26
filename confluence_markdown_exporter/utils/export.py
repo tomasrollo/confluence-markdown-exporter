@@ -1,8 +1,11 @@
 import json
+import logging
 import re
 from pathlib import Path
 
 from confluence_markdown_exporter.utils.app_data_store import get_settings
+
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 export_options = settings.export
@@ -48,13 +51,16 @@ def parse_encode_setting(encode_setting: str) -> dict[str, str]:
 
 def save_file(file_path: Path, content: str | bytes) -> None:
     """Save content to a file, creating parent directories as needed."""
+    logger.info(f"Saving file: {file_path}")
     file_path.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(content, bytes):
         with file_path.open("wb") as file:
             file.write(content)
+        logger.info(f"Saved {len(content)} bytes to {file_path}")
     elif isinstance(content, str):
         with file_path.open("w", encoding="utf-8") as file:
             file.write(content)
+        logger.info(f"Saved {len(content)} characters to {file_path}")
     else:
         msg = "Content must be either a string or bytes."
         raise TypeError(msg)

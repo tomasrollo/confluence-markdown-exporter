@@ -133,6 +133,7 @@ class Organization(BaseModel):
         return [page for space in self.spaces for page in space.pages]
 
     def export(self) -> None:
+        logger.info(f"Exporting organization with {len(self.spaces)} spaces")
         export_pages(self.pages)
 
     @classmethod
@@ -144,6 +145,7 @@ class Organization(BaseModel):
     @classmethod
     @functools.lru_cache(maxsize=100)
     def from_api(cls) -> "Organization":
+        logger.info("Fetching all spaces from Confluence API")
         return cls.from_json(
             cast(
                 "JsonResponse",
@@ -166,6 +168,7 @@ class Space(BaseModel):
         return [self.homepage, *homepage.descendants]
 
     def export(self) -> None:
+        logger.info(f"Exporting space '{self.key}' with {len(self.pages)} pages")
         export_pages(self.pages)
 
     @classmethod
@@ -180,6 +183,7 @@ class Space(BaseModel):
     @classmethod
     @functools.lru_cache(maxsize=100)
     def from_key(cls, space_key: str) -> "Space":
+        logger.info(f"Fetching space '{space_key}' from Confluence API")
         return cls.from_json(
             cast("JsonResponse", confluence.get_space(space_key, expand="homepage"))
         )
@@ -395,11 +399,13 @@ class Page(Document):
             logger.warning(f"Skipping export for inaccessible page with ID {self.id}")
             return
 
+        logger.info(f"Exporting page '{self.title}' (ID: {self.id})")
         if DEBUG:
             self.export_body()
         # Export attachments first so the files can be utilized during markdown conversion
         self.export_attachments()
         self.export_markdown()
+        logger.info(f"Successfully exported page '{self.title}' (ID: {self.id})")
 
     def export_with_descendants(self) -> None:
         export_pages([self.id, *self.descendants])
@@ -504,6 +510,7 @@ class Page(Document):
     @classmethod
     @functools.lru_cache(maxsize=1000)
     def from_id(cls, page_id: int) -> "Page":
+        logger.info(f"Fetching page with ID {page_id} from Confluence API")
         try:
             return cls.from_json(
                 cast(
@@ -1055,6 +1062,8 @@ def export_pages(page_ids: list[int]) -> None:
         page_ids: List of pages to export.
         output_path: The output path.
     """
+    logger.info(f"Starting batch export of {len(page_ids)} pages")
     for page_id in (pbar := tqdm(page_ids, smoothing=0.05)):
         pbar.set_postfix_str(f"Exporting page {page_id}")
         export_page(page_id)
+    logger.info(f"Completed batch export of {len(page_ids)} pages")
