@@ -336,6 +336,7 @@ class Page(Document):
     editor2: str
     labels: list["Label"]
     attachments: list["Attachment"]
+    version: "Version | None" = None
 
     @property
     def descendants(self) -> list[int]:
@@ -495,6 +496,7 @@ class Page(Document):
             ],
             attachments=Attachment.from_page_id(data.get("id", 0)),
             ancestors=[ancestor.get("id") for ancestor in data.get("ancestors", [])][1:],
+            version=Version.from_json(data.get("version", {})) if data.get("version") else None,
         )
 
     @classmethod
@@ -507,7 +509,7 @@ class Page(Document):
                     confluence.get_page_by_id(
                         page_id,
                         expand="body.view,body.export_view,body.editor2,metadata.labels,"
-                        "metadata.properties,ancestors",
+                        "metadata.properties,ancestors,version",
                     ),
                 )
             )
@@ -524,6 +526,7 @@ class Page(Document):
                 labels=[],
                 attachments=[],
                 ancestors=[],
+                version=None,
             )
 
     @classmethod
@@ -579,7 +582,16 @@ class Page(Document):
         @property
         def front_matter(self) -> str:
             indent = self.options["front_matter_indent"]
-            self.set_page_properties(tags=self.labels)
+            # Add last updated if available
+            last_updated = None
+            if self.page.version and self.page.version.when:
+                last_updated = self.page.version.when
+            
+            props = {"tags": self.labels}
+            if last_updated:
+                props["last_updated"] = last_updated
+            
+            self.set_page_properties(**props)
 
             if not self.page_properties:
                 return ""
