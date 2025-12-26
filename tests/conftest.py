@@ -111,7 +111,13 @@ def confluence_page_response() -> dict[str, Any]:
         "status": "current",
         "title": "Test Page",
         "space": {"key": "TEST", "name": "Test Space", "id": "123"},
-        "created": "2023-01-01T00:00:00.000Z",
+        "history": {
+            "createdDate": "2023-01-01T00:00:00.000Z",
+            "createdBy": {
+                "username": "testuser",
+                "displayName": "Test User",
+            }
+        },
         "version": {
             "number": 1,
             "when": "2023-01-01T00:00:00.000Z",

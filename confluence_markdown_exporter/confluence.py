@@ -478,6 +478,12 @@ class Page(Document):
 
     @classmethod
     def from_json(cls, data: JsonResponse) -> "Page":
+        # Extract created date from history.createdDate which is the standard Confluence API field
+        created = None
+        if "history" in data:
+            history = data.get("history", {})
+            created = history.get("createdDate")
+        
         return cls(
             id=data.get("id", 0),
             title=data.get("title", ""),
@@ -492,7 +498,7 @@ class Page(Document):
             attachments=Attachment.from_page_id(data.get("id", 0)),
             ancestors=[ancestor.get("id") for ancestor in data.get("ancestors", [])][1:],
             version=Version.from_json(data.get("version", {})) if data.get("version") else None,
-            created=data.get("created"),
+            created=created,
         )
 
     @classmethod
@@ -505,7 +511,7 @@ class Page(Document):
                     confluence.get_page_by_id(
                         page_id,
                         expand="body.view,body.export_view,body.editor2,metadata.labels,"
-                        "metadata.properties,ancestors,version",
+                        "metadata.properties,ancestors,version,history.createdBy",
                     ),
                 )
             )
